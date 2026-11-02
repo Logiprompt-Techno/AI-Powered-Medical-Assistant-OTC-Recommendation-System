@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - AI Medical Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user.css') }}">
+
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark-mode');
+        }
+    </script>
+</head>
+<body>
+    <div class="container user-container">
+        <div class="card" style="border-top: 5px solid #3b82f6; border-radius: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); padding: 40px; margin: 40px auto; max-width: 500px; background: var(--card-bg, #ffffff);">
+            <div style="text-align: center; margin-bottom: 15px;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="url(#grad1)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <defs>
+                        <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#3498db;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#9b59b6;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <line x1="12" y1="2" x2="12" y2="22"></line>
+                    <path d="M12 4c-3-2-6-1-8 2 2 0 5-1 8-2z"></path>
+                    <path d="M12 4c3-2 6-1 8 2-2 0-5-1-8-2z"></path>
+                    <path d="M9 8c2-2 4-2 6 0 2 2-2 4-6 6-2 2 0 4 2 6"></path>
+                    <path d="M15 8c-2-2-4-2-6 0-2 2 2 4 6 6 2 2 0 4-2 6"></path>
+                    <circle cx="12" cy="2" r="1.5" fill="url(#grad1)"></circle>
+                </svg>
+            </div>
+            <h2 class="text-center section-title" style="margin-top:0; font-weight: 800; color: var(--text-color, #1e293b); font-size: 1.5rem; margin-bottom: 25px;">Create an Account</h2>
+            
+            {% if error %}
+            <div class="error-msg" style="background: #fff5f5; color: #c53030; padding: 12px; border-radius: 8px; border-left: 4px solid #e53e3e; margin-bottom: 20px; font-weight: 500;">{{ error }}</div>
+            {% endif %}
+
+            <form method="POST" action="{{ url_for('user.register') }}" id="register-form" novalidate>
+                <div class="form-group" style="margin-bottom:15px; position: relative;">
+                    <span style="position: absolute; left: 12px; top: 12px; color: #94a3b8;">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    </span>
+                    <input type="text" name="full_name" id="reg-name" class="form-control" placeholder="Full Name *" required minlength="3" pattern="^[A-Za-z\s]+$" style="padding-left: 40px; height: 45px; border-radius: 6px; border: 1px solid #e2e8f0; background: var(--input-bg, #fff); color: var(--text-color, #333);">
+                    <div id="err-name" class="text-danger small" style="display: none; margin-top: 5px; color: #e74c3c;"></div>
+                </div>
+
+                <div class="form-group" style="margin-bottom:15px; position: relative;">
+                    <span style="position: absolute; left: 12px; top: 12px; color: #94a3b8;">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><path d="M22 6l-10 7L2 6"></path></svg>
+                    </span>
+                    <input type="email" name="email" id="reg-email" class="form-control" placeholder="Email Address *" required style="padding-left: 40px; height: 45px; border-radius: 6px; border: 1px solid #e2e8f0; background: var(--input-bg, #fff); color: var(--text-color, #333);">
+                    <div id="err-email" class="text-danger small" style="display: none; margin-top: 5px; color: #e74c3c;"></div>
+                </div>
+
+                <div class="form-group" style="margin-bottom:15px; position: relative;">
+                    <span style="position: absolute; left: 12px; top: 12px; color: #94a3b8;">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0110 0v4"></path></svg>
+                    </span>
+                    <input type="password" name="password" id="reg-password" class="form-control" placeholder="Password *" required minlength="6" style="padding-left: 40px; height: 45px; border-radius: 6px; border: 1px solid #e2e8f0; background: var(--input-bg, #fff); color: var(--text-color, #333);">
+                    <div id="err-password" class="text-danger small" style="display: none; margin-top: 5px; color: #e74c3c;"></div>
+                </div>
+
+                <div class="form-row" style="margin-bottom:15px; display: flex; gap: 15px;">
+                    <div class="form-group half-width" style="flex: 1; position: relative;">
+                        <span style="position: absolute; left: 12px; top: 12px; color: #94a3b8;">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        </span>
+                        <input type="number" name="age" id="reg-age" class="form-control" placeholder="Age *" required min="0" max="120" style="padding-left: 40px; height: 45px; border-radius: 6px; border: 1px solid #e2e8f0; background: var(--input-bg, #fff); color: var(--text-color, #333);">
+                        <div id="err-age" class="text-danger small" style="display: none; margin-top: 5px; color: #e74c3c;"></div>
+                    </div>
+                    <div class="form-group half-width" style="flex: 1; position: relative;">
+                        <select name="gender" id="reg-gender" class="form-control" required style="height: 45px; border-radius: 6px; border: 1px solid #e2e8f0; background: var(--input-bg, #fff); color: var(--text-color, #333); padding-left: 15px;">
+                            <option value="" disabled selected hidden>Gender *</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <div id="err-gender" class="text-danger small" style="display: none; margin-top: 5px; color: #e74c3c;"></div>
+                    </div>
+                </div>
+
+                <div class="form-row" style="margin-bottom:15px; display: flex; gap: 15px;">
+                    <div class="form-group half-width" style="flex: 1;">
+                        <label class="form-label fw-bold" style="font-size: 0.9em; color: var(--text-muted, #64748b); margin-bottom: 5px; display: block;">Height (cm)</label>
+                        <input type="number" name="height" id="reg-height" class="form-control" min="0" step="0.1" placeholder="Optional" style="height: 45px; border-radius: 6px; border: 1px solid #e2e8f0; background: var(--input-bg, #fff); color: var(--text-color, #333);">
+                        <div id="err-height" class="text-danger small" style="display: none; margin-top: 5px; color: #e74c3c;"></div>
+                    </div>
+                    <div class="form-group half-width" style="flex: 1;">
+                        <label class="form-label fw-bold" style="font-size: 0.9em; color: var(--text-muted, #64748b); margin-bottom: 5px; display: block;">Weight (kg)</label>
+                        <input type="number" name="weight" id="reg-weight" class="form-control" min="0" step="0.1" placeholder="Optional" style="height: 45px; border-radius: 6px; border: 1px solid #e2e8f0; background: var(--input-bg, #fff); color: var(--text-color, #333);">
+                        <div id="err-weight" class="text-danger small" style="display: none; margin-top: 5px; color: #e74c3c;"></div>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-submit w-100 mt-3" style="background-color: #3b82f6; color: white; border: none; border-radius: 6px; padding: 12px; font-weight: 600; font-size: 1.1rem; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.backgroundColor='#2563eb'" onmouseout="this.style.backgroundColor='#3b82f6'">Register</button>
+            </form>
+            
+            <script>
+                document.getElementById('register-form').addEventListener('submit', function(e) {
+                    let valid = true;
+                    
+                    // Clear existing errors
+                    document.querySelectorAll('.text-danger.small').forEach(el => el.style.display = 'none');
+                    
+                    // Helper to show error
+                    function showError(id, message) {
+                        const errEl = document.getElementById('err-' + id);
+                        errEl.textContent = message;
+                        errEl.style.display = 'block';
+                        valid = false;
+                    }
+
+                    // Full Name Validation
+                    const name = document.getElementById('reg-name').value;
+                    const nameRegex = /^[A-Za-z\s]+$/;
+                    if (!name.trim()) {
+                        showError('name', 'Full name is required.');
+                    } else if (name.length < 3) {
+                        showError('name', 'Name must be at least 3 characters.');
+                    } else if (!nameRegex.test(name)) {
+                        showError('name', 'Only letters and spaces are allowed.');
+                    }
+
+                    // Email Validation
+                    const email = document.getElementById('reg-email').value;
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!email.trim()) {
+                        showError('email', 'Email is required.');
+                    } else if (!emailRegex.test(email)) {
+                        showError('email', 'Please enter a valid email address.');
+                    }
+
+                    // Password Validation
+                    const password = document.getElementById('reg-password').value;
+                    if (!password) {
+                        showError('password', 'Password is required.');
+                    } else if (password.length < 6) {
+                        showError('password', 'Password must be at least 6 characters.');
+                    }
+
+                    // Age Validation
+                    const age = document.getElementById('reg-age').value;
+                    if (!age) {
+                        showError('age', 'Age is required.');
+                    } else {
+                        const ageNum = parseInt(age);
+                        if (isNaN(ageNum) || ageNum < 0 || ageNum > 120) {
+                            showError('age', 'Please enter a valid age between 0 and 120.');
+                        }
+                    }
+
+                    // Gender Validation
+                    const gender = document.getElementById('reg-gender').value;
+                    if (!gender) {
+                        showError('gender', 'Please select a gender.');
+                    }
+
+                    // Height Validation (Optional)
+                    const height = document.getElementById('reg-height').value;
+                    if (height) {
+                        const heightNum = parseFloat(height);
+                        if (isNaN(heightNum) || heightNum < 0) {
+                            showError('height', 'Please enter a valid positive height.');
+                        }
+                    }
+
+                    // Weight Validation (Optional)
+                    const weight = document.getElementById('reg-weight').value;
+                    if (weight) {
+                        const weightNum = parseFloat(weight);
+                        if (isNaN(weightNum) || weightNum < 0) {
+                            showError('weight', 'Please enter a valid positive weight.');
+                        }
+                    }
+
+                    if (!valid) {
+                        e.preventDefault(); // Prevent form submission if any validation fails
+                    }
+                });
+            </script>
+            <div class="text-center mt-4" style="font-size: 0.95rem; color: #64748b;">
+                <p style="margin-bottom:10px;">Already have an account? <a href="{{ url_for('login') }}" class="btn-link" style="color: #3b82f6; text-decoration: none; font-weight: 600;">Login here</a></p>
+                <a href="/" class="text-muted text-decoration-none" style="color: #94a3b8;">&larr; Back to Home Predictor</a>
+            </div>
+        </div>
+    </div>
+
+<script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+</body>
+</html>
+

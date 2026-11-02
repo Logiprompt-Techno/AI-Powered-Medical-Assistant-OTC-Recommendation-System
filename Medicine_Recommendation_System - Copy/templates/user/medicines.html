@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medicine Directory - AI Medical Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user.css') }}">
+    <style>
+        .medicine-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            border: 1px solid #edf2f7;
+            border-left: 5px solid #3498db;
+            transition: transform 0.2s;
+        }
+        .medicine-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+        }
+        .med-title {
+            color: #2c3e50;
+            margin: 0 0 10px 0;
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+        .med-category {
+            display: inline-block;
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        .med-otc {
+            display: inline-block;
+            background: #e8f8f5;
+            color: #1abc9c;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 5px;
+            margin-bottom: 15px;
+        }
+        .med-rx {
+            display: inline-block;
+            background: #fdf2e9;
+            color: #e67e22;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-left: 5px;
+            margin-bottom: 15px;
+        }
+        .med-desc {
+            color: #7f8c8d;
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        .med-dosage {
+            background: #f4f6f8;
+            padding: 10px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            border-left: 3px solid #f39c12;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .med-safety {
+            background: #fff5f5;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: #c53030;
+            border-left: 3px solid #e53e3e;
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+    </style>
+
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark-mode');
+        }
+    </script>
+</head>
+<body style="background: #f8f9fa;">
+    <!-- Navbar -->
+    <nav style="display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; background-color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 40px; position: sticky; top: 0; z-index: 1000;">
+        <div style="font-size: 1.4rem; font-weight: 800; color: #2c3e50; text-decoration: none;">
+            <a href="{{ url_for('home') }}" style="color: inherit; text-decoration: none;"><span class="icon" style="color: #3498db;">🩺</span> AI Medical Assistant</a>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <button class="nav-btn-ghost theme-toggle-btn" onclick="toggleTheme()" style="background: none; border: none; font-size: 1.2rem; cursor: pointer;" title="Toggle Dark Mode">🌙</button>
+            {% if session.get('user_id') %}
+                <span style="color: #7f8c8d; font-weight: 600; margin-right: 10px; font-size: 0.95rem;">Hello, {{ session.get('user_name') }}</span>
+                <a href="{{ url_for('user.dashboard') }}" class="nav-btn-outline">Dashboard</a>
+                <a href="{{ url_for('user.tools') }}" class="nav-btn-outline">Health Tools</a>
+                <a href="{{ url_for('user.medicines') }}" class="nav-btn-outline" style="background: #e2e8f0; color: #2c3e50; border-color: #cbd5e0;">Medicine Directory</a>
+                <a href="{{ url_for('user.favorites') }}" class="nav-btn-outline">My Favorites</a>
+                <a href="/history" class="nav-btn-outline">History</a>
+                <a href="{{ url_for('user.profile') }}" class="nav-btn-outline">Profile</a>
+                <a href="{{ url_for('logout') }}" class="nav-btn-danger">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="nav-btn-ghost">Login</a>
+                <a href="{{ url_for('user.register') }}" class="nav-btn-primary">Register</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="container user-container" style="max-width: 1000px;">
+        <div style="margin-bottom: 30px; text-align: center;">
+            <h2 style="color: #2c3e50; font-size: 2.2rem; font-weight: 800; margin-bottom: 10px;"><span class="icon">💊</span> Medicine Directory</h2>
+            <p class="text-muted" style="font-size: 1.1rem; max-width: 600px; margin: 0 auto;">Search our clinical database for information on over-the-counter and prescription medications, their uses, and safety warnings.</p>
+        </div>
+
+        <!-- Search Bar -->
+        <form method="GET" action="{{ url_for('user.medicines') }}" style="margin-bottom: 40px; display: flex; gap: 10px; max-width: 600px; margin-left: auto; margin-right: auto;">
+            <div class="input-group" style="flex: 1; display: flex; align-items: center; border: 2px solid #cbd5e0; border-radius: 8px; overflow: hidden; background: white; transition: border-color 0.3s;">
+                <span style="padding: 12px 15px; color: #a0aec0; font-size: 1.2rem;">🔍</span>
+                <input type="text" name="search" value="{{ search_query }}" style="flex: 1; padding: 12px; border: none; outline: none; font-size: 1rem; color: #4a5568;" placeholder="Search by medicine name or category (e.g. Paracetamol, Fever)...">
+            </div>
+            <button type="submit" style="padding: 12px 25px; background-color: #3498db; color: white; border: none; border-radius: 8px; font-weight: bold; font-size: 1.05rem; cursor: pointer; transition: background 0.2s;">Search</button>
+            {% if search_query %}
+                <a href="{{ url_for('user.medicines') }}" style="padding: 12px 20px; background-color: #f1f2f6; color: #7f8c8d; border-radius: 8px; font-weight: bold; text-decoration: none; display: flex; align-items: center;">Clear</a>
+            {% endif %}
+        </form>
+
+        <!-- Medicine Results -->
+        {% if search_query %}
+            <h4 style="color: #7f8c8d; margin-bottom: 20px;">Found {{ medicines|length }} result(s) for "{{ search_query }}"</h4>
+        {% endif %}
+
+        {% if medicines %}
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(400px, 1fr)); gap: 20px;">
+                {% for med in medicines %}
+                <div class="medicine-card">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                        <h3 class="med-title" style="margin-bottom: 0;">{{ med.name }}</h3>
+                        {% if session.get('user_id') %}
+                            <button class="btn-favorite" data-id="{{ med._id }}" onclick="toggleFavorite('{{ med._id }}', this)" 
+                                style="background: none; border: 1px solid #e2e8f0; border-radius: 20px; padding: 5px 12px; cursor: pointer; display: flex; align-items: center; gap: 5px; font-weight: 600; font-size: 0.9rem; transition: all 0.2s; 
+                                {% if (med._id | string) in saved_medicine_ids %}color: #e74c3c; background: #fef0f0; border-color: #fadbd8;{% else %}color: #7f8c8d;{% endif %}">
+                                {% if (med._id | string) in saved_medicine_ids %}❤️ Saved{% else %}🤍 Save{% endif %}
+                            </button>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <span class="med-category">{{ med.disease_category }}</span>
+                        {% if med.is_otc %}
+                            <span class="med-otc">OTC Available</span>
+                        {% else %}
+                            <span class="med-rx">Prescription Required</span>
+                        {% endif %}
+                    </div>
+                    <p class="med-desc"><strong><span class="icon">📝</span> Uses:</strong> {{ med.description }}</p>
+                    
+                    {% if med.dosage %}
+                    <div class="med-dosage">
+                        <span class="icon" style="font-size: 1.1rem; line-height: 1;">⏱️</span>
+                        <div>
+                            <strong style="color: #d35400;">Dosage:</strong><br>
+                            {{ med.dosage }}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if med.side_effects or med.safety_info %}
+                    <div class="med-safety">
+                        <strong><span class="icon" style="font-size: 1.1rem;">⚠️</span> Side Effects & Precautions:</strong><br>
+                        {{ med.side_effects if med.side_effects else med.safety_info }}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 50px; background: white; border-radius: 12px; border: 1px dashed #cbd5e0;">
+                <div style="font-size: 3rem; margin-bottom: 15px;">🏥</div>
+                <h3 style="color: #2c3e50; margin-bottom: 10px;">No medicines found</h3>
+                <p style="color: #7f8c8d;">Try adjusting your search terms or browse our general categories.</p>
+            </div>
+        {% endif %}
+
+    </div>
+
+    <script>
+        function toggleFavorite(medicineId, btnElement) {
+            fetch(`/user/favorites/toggle/${medicineId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'added') {
+                    btnElement.innerHTML = '❤️ Saved';
+                    btnElement.style.color = '#e74c3c';
+                    btnElement.style.background = '#fef0f0';
+                    btnElement.style.borderColor = '#fadbd8';
+                } else if (data.status === 'removed') {
+                    btnElement.innerHTML = '🤍 Save';
+                    btnElement.style.color = '#7f8c8d';
+                    btnElement.style.background = 'none';
+                    btnElement.style.borderColor = '#e2e8f0';
+                }
+            })
+            .catch(error => {
+                console.error('Error toggling favorite:', error);
+                alert("Failed to update favorites. Please try again.");
+            });
+        }
+    </script>
+
+<script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+</body>
+</html>
+

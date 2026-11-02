@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medicine Recommendation System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark-mode');
+        }
+    </script>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav style="display: flex; justify-content: space-between; align-items: center; padding: 15px 5%; background-color: white; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 40px; position: sticky; top: 0; z-index: 1000;">
+        <div style="font-size: 1.4rem; font-weight: 800; color: #2c3e50; text-decoration: none;">
+            <a href="{{ url_for('home') }}" style="color: inherit; text-decoration: none;"><span class="icon" style="color: #3498db;">[+]</span> AI Medical Assistant</a>
+        </div>
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <button class="nav-btn-ghost theme-toggle-btn" onclick="toggleTheme()" style="background: none; border: none; font-size: 1.2rem; cursor: pointer;" title="Toggle Dark Mode">[Moon]</button>
+            {% if session.get('user_id') %}
+                <span style="color: #7f8c8d; font-weight: 600; margin-right: 10px; font-size: 0.95rem;">Hello, {{ session.get('user_name') }}</span>
+                <a href="{{ url_for('user.dashboard') }}" class="nav-btn-outline">Dashboard</a>
+                <a href="{{ url_for('user.tools') }}" class="nav-btn-outline">Health Tools</a>
+                <a href="{{ url_for('user.medicines') }}" class="nav-btn-outline">Medicine Directory</a>
+                <a href="{{ url_for('user.favorites') }}" class="nav-btn-outline">My Favorites</a>
+                <a href="/history" class="nav-btn-outline">History</a>
+                <a href="{{ url_for('user.profile') }}" class="nav-btn-outline">Profile</a>
+                <a href="{{ url_for('logout') }}" class="nav-btn-danger">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="nav-btn-ghost">Login</a>
+                <a href="{{ url_for('user.register') }}" class="nav-btn-primary">Register</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="container" style="max-width: 900px; margin: 0 auto; padding: 0 20px;">
+        <header style="text-align: center; margin-bottom: 40px;">
+            <h1 style="color: #2c3e50; font-size: 2.5rem; font-weight: 800; margin-bottom: 10px;">Symptom Predictor</h1>
+            <p style="color: #7f8c8d; font-size: 1.1rem;">Select your symptoms below to get an instant, AI-driven medical analysis.</p>
+        </header>
+
+        <form id="symptom-form" class="predictor-card" style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid #eaeaea;">
+            <!-- Search & Checkbox Container -->
+            <div class="mb-4">
+                <label class="form-label fw-bold" style="color: #2c3e50; font-size: 1.1rem; margin-bottom: 15px; display: block;">1. Describe your symptoms</label>
+                
+                <!-- Search Box -->
+                <div class="input-group" style="display: flex; align-items: center; border: 2px solid #e2e8f0; border-radius: 8px; overflow: hidden; margin-bottom: 20px; transition: border-color 0.3s;">
+                    <span style="padding: 12px 15px; background: white; color: #a0aec0; font-size: 1.2rem;">[Search]</span>
+                    <input type="text" id="symptom-search" style="flex: 1; padding: 12px; border: none; outline: none; font-size: 1rem; color: #4a5568;" placeholder="Search symptoms (e.g., fever, rash, cough)...">
+                </div>
+
+                <!-- Selection Controls -->
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; background: #f8fafc; padding: 10px 15px; border-radius: 8px; border: 1px solid #edf2f7;">
+                    <div style="display: flex; gap: 10px;">
+                        <button type="button" id="btn-select-all" class="btn-sm-outline">Select All</button>
+                        <button type="button" id="btn-clear-all" class="btn-sm-outline text-danger">Clear All</button>
+                    </div>
+                    <div id="symptom-counter" style="font-weight: 700; color: #3498db; font-size: 0.95rem; background: #ebf8ff; padding: 5px 12px; border-radius: 20px;">Selected: 0</div>
+                </div>
+
+                <!-- Scrollable Checkbox Box -->
+                <div id="symptom-container" class="symptom-scroll-box" style="height: 300px; overflow-y: auto; border: 2px solid #e2e8f0; border-radius: 8px; padding: 15px; background: #fdfdfd; margin-bottom: 25px;">
+                    <!-- Checkboxes will be dynamically injected here via JavaScript -->
+                </div>
+                <!-- No match message -->
+                <div id="no-symptoms-msg" class="text-center p-2 text-muted" style="display: none; font-style: italic;">
+                    No symptoms found matching your search.
+                </div>
+            </div>
+
+            <button type="submit" id="submit-btn" class="btn-predict-large" style="width: 100%; padding: 16px; background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); color: white; border: none; border-radius: 8px; font-size: 1.2rem; font-weight: 700; cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4); display: flex; justify-content: center; align-items: center; gap: 10px;">
+                <span>Analyze Symptoms</span>
+                <span style="font-size: 1.2rem;">-&gt;</span>
+            </button>
+        </form>
+
+        <!-- Loading Indicator -->
+        <div id="loader" class="hidden">
+            <div class="spinner"></div>
+            <p>Analyzing your symptoms...</p>
+        </div>
+
+        <!-- Error Message -->
+        <div id="error-message" class="hidden card error-card"></div>
+
+        <!-- Results Container -->
+        <div id="result-container" class="hidden result-box-shadow">
+            <!-- Disease Banner -->
+            <div class="card disease-card gradient-success">
+                <div class="d-flex justify-between align-center">
+                    <h2 class="section-title text-white m-0">[+] Predicted Condition</h2>
+                    <span class="badge-confidence">High Confidence</span>
+                </div>
+                <h3 id="res-disease" class="disease-highlight mt-2 mb-2"></h3>
+                <p id="res-description" class="disease-description mb-0"></p>
+            </div>
+
+            <div class="results-grid mt-4">
+                <!-- Treatments -->
+                <div class="card treatments-card clinical-border">
+                    <h3 class="section-title text-primary"><span class="icon">&#128138;</span> Suggested Over-the-Counter (OTC) Medicines</h3>
+                    <p class="text-muted small mb-3">Based on your selected symptoms, the following verified OTC medications may be suitable:</p>
+                    <ul id="res-medications" class="pill-list mt-2"></ul>
+                </div>
+
+                <!-- Precautions -->
+                <div class="card precautions-card clinical-border">
+                    <h3 class="section-title text-warning"><span class="icon">&#9888;</span> Recommended Precautions</h3>
+                    <p class="text-muted small mb-3">General guidelines to help manage your condition:</p>
+                    <ul id="res-precautions" class="checklist mt-2"></ul>
+                </div>
+                        </div>
+
+            <!-- Smart Medicine Safety Module Container -->
+            <div id="safety-warning-container" class="mt-4" style="display: none;"></div>
+
+            <!-- Medical Disclaimer & Hospitals -->
+            <div class="card warning-card mt-4">
+                <div style="display: flex; gap: 15px; align-items: flex-start;">
+                    <div style="font-size: 2rem;">&#9888;</div>
+                    <div>
+                        <h3 class="warning-title m-0">Important Medical Disclaimer</h3>
+                        <p id="res-disclaimer" class="warning-text mt-2 mb-2"></p>
+                        <hr style="border: 0; border-top: 1px solid rgba(0,0,0,0.1); margin: 10px 0;">
+                        <p class="warning-text mb-2" style="font-weight: 600;">For urgent or severe symptoms, seek professional medical care. Find nearby healthcare facilities.</p>
+                        <button onclick="findNearbyHospitals(this)" class="nav-btn-outline" style="border-color: #e74c3c; color: #e74c3c; display: inline-flex; align-items: center; gap: 5px;">
+                            <span class="icon">[Hospital]</span> Find Nearby Hospitals
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- User Feedback System -->
+            {% if session.get('user_id') %}
+            <div class="card mt-4" id="feedback-card" style="background-color: #f8f9fa; border: 1px solid #e9ecef; text-align: center;">
+                <h3 class="section-title" style="margin-bottom: 15px; color: #2c3e50;">[*] Rate Your Experience</h3>
+                <p class="text-muted" style="margin-bottom: 15px;">Was this prediction helpful? Let us know!</p>
+                
+                <div id="feedback-form-container">
+                    <form id="feedback-form">
+                        <div class="star-rating" style="font-size: 2rem; color: #ddd; cursor: pointer; margin-bottom: 15px;" id="star-container">
+                            <span class="star" data-value="1">[*]</span>
+                            <span class="star" data-value="2">[*]</span>
+                            <span class="star" data-value="3">[*]</span>
+                            <span class="star" data-value="4">[*]</span>
+                            <span class="star" data-value="5">[*]</span>
+                        </div>
+                        <input type="hidden" id="feedback-rating" name="rating" required>
+                        
+                        <textarea id="feedback-message" class="form-control" rows="3" placeholder="Leave a short message (optional)..." style="margin-bottom: 15px;"></textarea>
+                        
+                        <button type="submit" class="btn-submit" style="width: auto; padding: 10px 30px;">Submit Feedback</button>
+                    </form>
+                    <div id="feedback-error" class="hidden error-msg" style="margin-top: 10px;"></div>
+                </div>
+                
+                <div id="feedback-success" class="hidden" style="color: #2ecc71; padding: 20px;">
+                    <h4>Thank you!</h4>
+                    <p>Your feedback has been securely submitted.</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+<script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+</body>
+</html>
+
+
+

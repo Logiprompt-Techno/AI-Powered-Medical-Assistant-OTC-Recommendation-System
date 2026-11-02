@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Medical Assistant - OTC Recommendations</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark-mode');
+        }
+    </script>
+</head>
+<body class="landing-body">
+    <!-- Navbar -->
+    <nav class="landing-nav">
+        <div class="nav-logo">
+            <span class="icon">🩺</span> AI Medical Assistant
+        </div>
+        <div class="nav-links">
+                <button class="nav-btn-ghost theme-toggle-btn" onclick="toggleTheme()" style="background: none; border: none; font-size: 1.2rem; cursor: pointer;" title="Toggle Dark Mode">🌙</button>
+            {% if session.get('user_id') or session.get('user_name') %}
+                <span style="color: #7f8c8d; font-weight: 600; margin-right: 15px;">Welcome, {{ session.get('user_name') }}</span>
+                <a href="{{ url_for('predictor') }}" class="btn-ghost">Predictor</a>
+                <a href="/history" class="btn-ghost">History</a>
+                <a href="{{ url_for('logout') }}" class="btn-outline" style="border-color: #e74c3c; color: #e74c3c;">Logout</a>
+            {% else %}
+                <a href="{{ url_for('login') }}" class="btn-ghost">Login</a>
+                <a href="{{ url_for('user.register') }}" class="btn-outline">Register</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero-section">
+        <div class="hero-content">
+            <span class="badge-new">Version 2.0 Now Live</span>
+            <h1 class="hero-title">Smart <span class="gradient-text">Healthcare</span> at Your Fingertips.</h1>
+            <p class="hero-subtitle">Experience our advanced AI-driven symptom analyzer. Get instant over-the-counter medicine recommendations and clinical precautions tailored to your condition.</p>
+            
+            <div class="hero-cta">
+                <a href="{{ url_for('predictor') }}" class="btn-primary-large">Launch Predictor ➔</a>
+            </div>
+            
+            <div class="hero-trust">
+                <p>Trusted by thousands of users for initial clinical guidance.</p>
+            </div>
+        </div>
+        
+        <div class="hero-visual">
+            <div class="floating-card c1">
+                <div class="card-icon">🧠</div>
+                <div>
+                    <h4>AI Powered</h4>
+                    <p>Random Forest accuracy</p>
+                </div>
+            </div>
+            <div class="floating-card c2">
+                <div class="card-icon">💊</div>
+                <div>
+                    <h4>OTC Medicine</h4>
+                    <p>Instant recommendations</p>
+                </div>
+            </div>
+            <div class="floating-card c3">
+                <div class="card-icon">🔒</div>
+                <div>
+                    <h4>Secure</h4>
+                    <p>Private health history</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Features Section -->
+    <section class="features-section">
+        <div class="section-header">
+            <h2>How it works</h2>
+            <p>Three simple steps to better health awareness.</p>
+        </div>
+        
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">1</div>
+                <h3>Select Symptoms</h3>
+                <p>Choose from our comprehensive list of clinical symptoms.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">2</div>
+                <h3>AI Analysis</h3>
+                <p>Our machine learning model analyzes your symptom combination instantly.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">3</div>
+                <h3>Get Recommendations</h3>
+                <p>Receive disease predictions, OTC medicines, and precautions.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Us Section -->
+    <section class="about-section" style="padding: 80px 5%; background: #fdfdfd; border-top: 1px solid #e9ecef; border-bottom: 1px solid #e9ecef;">
+        <div class="section-header">
+            <h2>About Us</h2>
+            <p>Empowering personal health decisions with cutting-edge AI.</p>
+        </div>
+        <div style="max-width: 800px; margin: 0 auto; text-align: center; color: #7f8c8d; line-height: 1.8; font-size: 1.1rem;">
+            <p>Our mission is to democratize initial health guidance through advanced Machine Learning. We built the AI Medical Assistant to instantly analyze symptoms and provide immediate, research-backed Over-The-Counter (OTC) medication suggestions. While we strongly advocate consulting certified healthcare professionals for definitive diagnoses, our platform bridges the gap when you need quick, reliable clinical insights at home.</p>
+        </div>
+    </section>
+
+    <!-- Contact Support Section -->
+    <section class="contact-section" style="padding: 80px 5%; background: white;">
+        <div class="section-header">
+            <h2>Contact Support</h2>
+            <p>We're here to help you get the most out of your medical assistant.</p>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; max-width: 900px; margin: 0 auto;">
+            <div class="feature-card" style="padding: 30px 20px;">
+                <div style="font-size: 2.5rem; margin-bottom: 15px;">📧</div>
+                <h3 style="margin-bottom: 10px; color: #2c3e50;">Email Us</h3>
+                <p style="margin-bottom: 0;"><a href="mailto:support@aimedical.com" style="color: #3498db; text-decoration: none; font-weight: 600;">support@aimedical.com</a></p>
+                <p style="color: #7f8c8d; font-size: 0.9em;">24/7 technical assistance</p>
+            </div>
+            <div class="feature-card" style="padding: 30px 20px;">
+                <div style="font-size: 2.5rem; margin-bottom: 15px;">📞</div>
+                <h3 style="margin-bottom: 10px; color: #2c3e50;">Call Us</h3>
+                <p style="margin-bottom: 0;"><a href="tel:+914711234567" style="color: #3498db; text-decoration: none; font-weight: 600;">+91 471 123 4567</a></p>
+                <p style="color: #7f8c8d; font-size: 0.9em;">Mon-Fri, 9am - 5pm IST</p>
+            </div>
+            <div class="feature-card" style="padding: 30px 20px;">
+                <div style="font-size: 2.5rem; margin-bottom: 15px;">🏢</div>
+                <h3 style="margin-bottom: 10px; color: #2c3e50;">Headquarters</h3>
+                <p style="color: #7f8c8d; margin-bottom: 0;">Technopark Phase 1, Opposite</p>
+                <p style="color: #7f8c8d; font-size: 0.9em;">Trivandrum, Kerala</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="landing-footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <span class="icon">🩺</span> AI Medical Assistant
+            </div>
+            <p class="disclaimer">
+                <strong>Disclaimer:</strong> This application provides educational information only. It does not replace professional medical diagnosis or treatment. Always consult a qualified healthcare provider.
+            </p>
+            <p class="copyright">&copy; 2026 AI Medical Assistant. All rights reserved.</p>
+        </div>
+    </footer>
+
+<script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+</body>
+</html>
+

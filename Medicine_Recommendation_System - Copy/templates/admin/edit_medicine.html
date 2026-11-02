@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Medicine - AI Medical Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark-mode');
+        }
+    </script>
+</head>
+<body>
+    <div class="container admin-container">
+        <!-- Header -->
+        <header class="admin-header" style="display: flex; flex-direction: column; gap: 15px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                <div>
+                    <h1 style="margin:0; color:#2c3e50;">⚙️ Edit Medicine</h1>
+                    <p style="margin:5px 0 0 0; color:#7f8c8d;">Update details for {{ medicine.name }}</p>
+                </div>
+                <div>
+                    <a href="{{ url_for('admin.medicines') }}" class="btn-outline" style="margin-right: 10px;">← Back</a>
+                    <a href="{{ url_for('logout') }}" class="btn-logout">Logout</a>
+                </div>
+            </div>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div style="padding: 15px; margin-bottom: 20px; border-radius: 4px; {% if category == 'success' %}background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb;{% else %}background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb;{% endif %}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <div class="card mt-4" style="background-color: #ffffff; border: 1px solid #e9ecef; padding: 30px;">
+            <form action="{{ url_for('admin.edit_medicine', medicine_id=medicine._id) }}" method="POST">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <div>
+                        <label style="font-weight: bold; display: block; margin-bottom: 8px; color: #2c3e50;">Medicine Name</label>
+                        <input type="text" name="name" value="{{ medicine.name }}" required style="width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 1rem;">
+                    </div>
+                    <div>
+                        <label style="font-weight: bold; display: block; margin-bottom: 8px; color: #2c3e50;">Category / Disease Focus</label>
+                        <input type="text" name="category" value="{{ medicine.category }}" required style="width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 1rem;">
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <label style="font-weight: bold; display: block; margin-bottom: 8px; color: #2c3e50;">Description / Uses</label>
+                    <textarea name="description" rows="3" style="width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 1rem;">{{ medicine.description }}</textarea>
+                </div>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <div>
+                        <label style="font-weight: bold; display: block; margin-bottom: 8px; color: #2c3e50;">Dosage</label>
+                        <input type="text" name="dosage" value="{{ medicine.dosage if medicine.dosage else '' }}" style="width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 1rem;" placeholder="e.g. 1 tablet every 6 hours">
+                    </div>
+                    <div>
+                        <label style="font-weight: bold; display: block; margin-bottom: 8px; color: #2c3e50;">Side Effects</label>
+                        <input type="text" name="side_effects" value="{{ medicine.side_effects if medicine.side_effects else (medicine.safety_info if medicine.safety_info else '') }}" style="width: 100%; padding: 12px; border: 1px solid #cbd5e0; border-radius: 6px; font-size: 1rem;" placeholder="e.g. Nausea, Dizziness">
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 30px;">
+                    <label style="font-weight: bold; display: flex; align-items: center; gap: 10px; cursor: pointer; color: #2c3e50;">
+                        <input type="checkbox" name="is_otc" value="yes" style="width: 18px; height: 18px;" {% if medicine.is_otc %}checked{% endif %}>
+                        Is Over-The-Counter (OTC)?
+                    </label>
+                </div>
+                
+                <div style="display: flex; gap: 15px;">
+                    <button type="submit" style="padding: 12px 25px; background-color: #f39c12; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 1.05rem;">Save Changes</button>
+                    <a href="{{ url_for('admin.medicines') }}" style="padding: 12px 25px; background-color: #95a5a6; color: white; border: none; border-radius: 6px; font-weight: bold; text-decoration: none; font-size: 1.05rem; display: inline-block;">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+<script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+</body>
+</html>
+

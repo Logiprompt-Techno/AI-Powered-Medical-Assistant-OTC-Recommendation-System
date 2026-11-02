@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Dashboard - AI Medical Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/user.css') }}">
+
+    <script>
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark-mode');
+        }
+    </script>
+</head>
+<body style="background: #f8f9fa; display: flex; margin: 0; min-height: 100vh;">
+    <!-- Left Sidebar -->
+    <aside style="width: 280px; background-color: #0f172a; display: flex; flex-direction: column; flex-shrink: 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; box-shadow: 2px 0 10px rgba(0,0,0,0.1); z-index: 1000;">
+        <div style="padding: 24px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); margin-bottom: 15px;">
+            <a href="{{ url_for('home') }}" style="color: white; text-decoration: none; display: flex; align-items: center; gap: 10px; font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em;">
+                <span class="icon" style="color: #3b82f6; font-size: 1.4rem;">🩺</span> AI Medical Assistant
+            </a>
+        </div>
+        
+        <div style="padding: 0 15px; display: flex; flex-direction: column; gap: 6px; flex-grow: 1;">
+            <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em; margin: 10px 0 5px 10px;">Menu</div>
+            
+            <a href="{{ url_for('user.dashboard') }}" style="color: white; text-decoration: none; padding: 12px 15px; border-radius: 8px; background: rgba(255,255,255,0.1); font-weight: 600; display: flex; align-items: center; gap: 12px; transition: background 0.2s; font-size: 0.95rem;">
+                <span style="font-size: 1.1rem; opacity: 0.9;">📊</span> Dashboard
+            </a>
+            <a href="{{ url_for('user.tools') }}" style="color: #94a3b8; text-decoration: none; padding: 12px 15px; border-radius: 8px; font-weight: 500; display: flex; align-items: center; gap: 12px; transition: all 0.2s; font-size: 0.95rem;" onmouseover="this.style.background='rgba(255,255,255,0.05)'; this.style.color='white';" onmouseout="this.style.background='transparent'; this.style.color='#94a3b8';">
+                <span style="font-size: 1.1rem; opacity: 0.7;">🧰</span> Health Tools
+            </a>
+            <a href="{{ url_for('user.medicines') }}" style="color: #94a3b8; text-decoration: none; padding: 12px 15px; border-radius: 8px; font-weight: 500; display: flex; align-items: center; gap: 12px; transition: all 0.2s; font-size: 0.95rem;" onmouseover="this.style.background='rgba(255,255,255,0.05)'; this.style.color='white';" onmouseout="this.style.background='transparent'; this.style.color='#94a3b8';">
+                <span style="font-size: 1.1rem; opacity: 0.7;">💊</span> Medicine Directory
+            </a>
+            <a href="{{ url_for('user.favorites') }}" style="color: #94a3b8; text-decoration: none; padding: 12px 15px; border-radius: 8px; font-weight: 500; display: flex; align-items: center; gap: 12px; transition: all 0.2s; font-size: 0.95rem;" onmouseover="this.style.background='rgba(255,255,255,0.05)'; this.style.color='white';" onmouseout="this.style.background='transparent'; this.style.color='#94a3b8';">
+                <span style="font-size: 1.1rem; opacity: 0.7;">⭐</span> My Favorites
+            </a>
+            <a href="/history" style="color: #94a3b8; text-decoration: none; padding: 12px 15px; border-radius: 8px; font-weight: 500; display: flex; align-items: center; gap: 12px; transition: all 0.2s; font-size: 0.95rem;" onmouseover="this.style.background='rgba(255,255,255,0.05)'; this.style.color='white';" onmouseout="this.style.background='transparent'; this.style.color='#94a3b8';">
+                <span style="font-size: 1.1rem; opacity: 0.7;">🕰️</span> History
+            </a>
+            
+            <div style="font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; letter-spacing: 0.1em; margin: 20px 0 5px 10px;">Account</div>
+            <a href="{{ url_for('user.profile') }}" style="color: #94a3b8; text-decoration: none; padding: 12px 15px; border-radius: 8px; font-weight: 500; display: flex; align-items: center; gap: 12px; transition: all 0.2s; font-size: 0.95rem;" onmouseover="this.style.background='rgba(255,255,255,0.05)'; this.style.color='white';" onmouseout="this.style.background='transparent'; this.style.color='#94a3b8';">
+                <span style="font-size: 1.1rem; opacity: 0.7;">👤</span> Profile
+            </a>
+        </div>
+        
+        <div style="padding: 15px; border-top: 1px solid rgba(255,255,255,0.05);">
+            <a href="{{ url_for('logout') }}" style="color: #fca5a5; text-decoration: none; padding: 12px 15px; border-radius: 8px; font-weight: 600; display: flex; align-items: center; gap: 12px; transition: all 0.2s; font-size: 0.95rem;" onmouseover="this.style.background='rgba(239, 68, 68, 0.1)'; this.style.color='#f87171';" onmouseout="this.style.background='transparent'; this.style.color='#fca5a5';">
+                <span style="font-size: 1.1rem;">🚪</span> Logout
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main style="flex-grow: 1; padding: 40px; background-color: #f8fafc; min-width: 0;">
+        <div style="max-width: 1200px; margin: 0 auto;">
+            <!-- Top Action Bar -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                <div>
+                    <h2 style="color: #0f172a; font-weight: 800; margin-bottom: 4px; font-size: 1.8rem; letter-spacing: -0.02em;">
+                        <span class="icon">👋</span> Welcome, {{ session.get('user_name') }}
+                    </h2>
+                    <p style="color: #64748b; margin: 0; font-size: 0.95rem; font-weight: 500;">Personal Health & Analytics Dashboard</p>
+                </div>
+                
+                <div style="display: flex; align-items: center; gap: 15px;">
+                    <button class="theme-toggle-btn" onclick="toggleTheme()" style="background: white; border: 1px solid #e2e8f0; border-radius: 50%; width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;" onmouseover="this.style.background='#f8fafc';" onmouseout="this.style.background='white';" title="Toggle Dark Mode">
+                        🌙
+                    </button>
+                    <div style="display: flex; align-items: center; gap: 10px; background: white; padding: 6px 16px 6px 6px; border-radius: 30px; border: 1px solid #e2e8f0; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                        <div style="width: 32px; height: 32px; background: #3b82f6; color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem;">
+                            {{ session.get('user_name')[0].upper() if session.get('user_name') else 'U' }}
+                        </div>
+                        <span style="color: #1e293b; font-weight: 600; font-size: 0.9rem;">{{ session.get('user_name') }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Status Bar -->
+    <div style="display: flex; gap: 20px; align-items: center; background: white; padding: 12px 20px; border-radius: 8px; border: 1px solid #e2e8f0; margin-bottom: 30px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); font-size: 0.85rem; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">
+        <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="display: inline-block; width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);"></span>
+            System Status: Online
+        </div>
+        <div style="width: 1px; height: 14px; background-color: #cbd5e1;"></div>
+        <div style="display: flex; align-items: center; gap: 6px;">
+            <span class="icon" style="font-size: 1rem;">🔒</span> Data: Encrypted
+        </div>
+        <div style="width: 1px; height: 14px; background-color: #cbd5e1;"></div>
+        <div>Last Sync: Just Now</div>
+    </div>
+
+    <!-- Summary Cards Grid -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin-bottom: 35px;">
+        <!-- Predictions Count Card -->
+        <div class="card stat-card" style="background: white; border: 1px solid #e2e8f0; border-top: 4px solid #3b82f6; border-radius: 10px; margin: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; height: 100%; padding: 35px 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);">
+            <div class="stat-title" style="font-size: 0.85rem; color: #64748b; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px;">Predictions Made</div>
+            <div class="stat-value" style="color: #0f172a; font-size: 4rem; font-weight: 800; line-height: 1; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; letter-spacing: -0.02em;">{{ total_predictions }}</div>
+        </div>
+        
+        <!-- Daily Health Tip Card -->
+        <div class="card" style="background: white; border: 1px solid #e2e8f0; border-top: 4px solid #10b981; border-radius: 10px; margin: 0; display: flex; flex-direction: column; justify-content: space-between; height: 100%; padding: 30px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                <h4 style="margin: 0; color: #0f172a; font-size: 1.1rem; display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: -0.01em;">
+                    <span style="display: flex; align-items: center; justify-content: center; width: 32px; height: 32px; background: #ecfdf5; color: #10b981; border-radius: 8px; font-size: 1.2rem;">💡</span> Daily Health Tip
+                </h4>
+                <button onclick="generateRandomTip()" style="background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; border-radius: 6px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; font-size: 0.9rem;" onmouseover="this.style.background='#f1f5f9'; this.style.color='#0f172a';" onmouseout="this.style.background='#f8fafc'; this.style.color='#64748b';" title="Get a new tip">
+                    🔄
+                </button>
+            </div>
+            <p id="health-tip-text" style="margin: 0; color: #334155; font-weight: 500; font-size: 1.05rem; line-height: 1.6; border-left: 3px solid #d1fae5; padding-left: 12px; font-style: italic;">Loading your daily tip...</p>
+        </div>
+
+        <!-- Nearby Hospitals Card -->
+        <div class="card" style="background: white; border: 1px solid #e2e8f0; border-top: 4px solid #ef4444; border-radius: 10px; margin: 0; display: flex; flex-direction: column; justify-content: space-between; height: 100%; padding: 30px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);">
+            <div style="display: flex; gap: 15px; align-items: flex-start; margin-bottom: 20px;">
+                <div style="display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; background: #fef2f2; color: #ef4444; border-radius: 12px; font-size: 1.8rem; flex-shrink: 0;">🚑</div>
+                <div>
+                    <h4 style="margin: 0 0 6px 0; color: #0f172a; font-size: 1.1rem; font-weight: 700; letter-spacing: -0.01em;">Emergency Care</h4>
+                    <p style="margin: 0; color: #64748b; font-size: 0.9rem; font-weight: 500; line-height: 1.5;">For urgent or severe symptoms, seek professional medical care.</p>
+                </div>
+            </div>
+            <button onclick="findNearbyHospitals(this)" class="nav-btn-outline" style="border-color: #e2e8f0; color: #0f172a; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: 8px; font-weight: 600; background: #f8fafc; cursor: pointer; width: 100%; transition: all 0.2s; font-size: 0.95rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05);" onmouseover="this.style.borderColor='#ef4444'; this.style.color='#ef4444'; this.style.background='white';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.color='#0f172a'; this.style.background='#f8fafc';">
+                🏥 Find Nearby Hospitals
+            </button>
+        </div>
+    </div>
+
+
+    <div class="card mt-3" style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 30px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.02);">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="m-0" style="color: #0f172a; font-weight: 700; font-size: 1.3rem; letter-spacing: -0.01em;">Your Recent Predictions</h3>
+            <a href="/history" class="btn-link" style="font-size: 0.9rem; font-weight: 600; color: #3b82f6; text-decoration: none; padding: 6px 12px; background: #eff6ff; border-radius: 6px; transition: background 0.2s;">View Full History →</a>
+        </div>
+        
+        <div class="table-responsive" style="border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden;">
+            <table class="user-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Predicted Disease</th>
+                        <th>Symptoms</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in recent_predictions %}
+                    <tr>
+                        <td style="white-space: nowrap; color: #475569; font-weight: 500;">
+                            {{ record.timestamp.strftime('%b %d, %Y') if record.timestamp else 'N/A' }}<br>
+                            <small style="color: #94a3b8; font-weight: 600;">{{ record.timestamp.strftime('%I:%M %p') if record.timestamp else '' }}</small>
+                        </td>
+                        <td><strong style="color: #0f172a; font-size: 1.05em; font-weight: 700;">{{ record.predicted_disease }}</strong></td>
+                        <td>
+                            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                            {% for symptom in record.selected_symptoms %}
+                                <span class="symptom-badge" style="background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600;">{{ symptom.replace('_', ' ').title() }}</span>
+                            {% endfor %}
+                            </div>
+                        </td>
+                        <td>
+                            <div style="display: flex; gap: 8px;">
+                                <a href="{{ url_for('user.download_pdf', prediction_id=record._id) }}" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: 6px 12px; background-color: white; border: 1px solid #e2e8f0; color: #475569; border-radius: 6px; font-size: 0.85rem; font-weight: 600; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0,0,0,0.05);" onmouseover="this.style.borderColor='#cbd5e1'; this.style.color='#0f172a'; this.style.background='#f8fafc';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.color='#475569'; this.style.background='white';">
+                                    📄 PDF
+                                </a>
+                                <button onclick="emailReport('{{ record._id }}', this)" style="border: 1px solid #3b82f6; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: 6px 12px; background-color: #3b82f6; color: white; border-radius: 6px; font-size: 0.85rem; font-weight: 600; transition: all 0.2s; box-shadow: 0 1px 2px rgba(59, 130, 246, 0.3);" onmouseover="this.style.backgroundColor='#2563eb'; this.style.borderColor='#2563eb';" onmouseout="this.style.backgroundColor='#3b82f6'; this.style.borderColor='#3b82f6';">
+                                    ✉️ Email
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="text-center" style="padding: 40px 20px; color: #94a3b8; font-weight: 500; font-style: italic;">
+                            You haven't made any predictions yet.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    </div>
+    </main>
+    
+    <script>
+    const healthTips = [
+        "Drink at least 8 glasses of water daily to stay hydrated.",
+        "Get 7-8 hours of quality sleep every night for better immunity.",
+        "Include fresh fruits and green vegetables in your daily diet.",
+        "Take short 5-minute walks during long work hours to improve circulation.",
+        "Wash your hands frequently with soap to prevent infections.",
+        "Practice deep breathing exercises to reduce daily stress.",
+        "Limit your intake of processed foods and added sugars.",
+        "Eat smaller, well-balanced meals throughout the day."
+    ];
+
+    function emailReport(predictionId, btnElement) {
+        const originalText = btnElement.innerText;
+        btnElement.innerText = "⏳ ...";
+        btnElement.disabled = true;
+        btnElement.style.backgroundColor = '#95a5a6';
+
+        fetch('/user/history/email/' + predictionId, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('✅ ' + data.message);
+            } else {
+                alert('❌ ' + data.message);
+            }
+        })
+        .catch(error => {
+            alert('❌ Network error. Please try again.');
+        })
+        .finally(() => {
+            btnElement.innerText = originalText;
+            btnElement.disabled = false;
+            btnElement.style.backgroundColor = '#3498db';
+        });
+    }
+
+    function generateRandomTip() {
+        const randomIndex = Math.floor(Math.random() * healthTips.length);
+        const tipElement = document.getElementById('health-tip-text');
+        
+        // Add a small fade effect for interactivity
+        tipElement.style.opacity = '0';
+        setTimeout(() => {
+            tipElement.innerText = healthTips[randomIndex];
+            tipElement.style.opacity = '1';
+        }, 200);
+    }
+
+    // Set a tip when the page loads
+    document.addEventListener("DOMContentLoaded", function() {
+        generateRandomTip();
+    });
+
+    function findNearbyHospitals(btnElement) {
+        const originalText = btnElement.innerHTML;
+        btnElement.innerHTML = "⏳ Locating...";
+        btnElement.disabled = true;
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    const mapsUrl = `https://www.google.com/maps/search/hospitals/@${lat},${lng},14z`;
+                    window.open(mapsUrl, '_blank');
+                    btnElement.innerHTML = originalText;
+                    btnElement.disabled = false;
+                },
+                function(error) {
+                    alert('❌ Unable to access your location. Please ensure location services are enabled.');
+                    btnElement.innerHTML = originalText;
+                    btnElement.disabled = false;
+                }
+            );
+        } else {
+            alert('❌ Geolocation is not supported by this browser.');
+            btnElement.innerHTML = originalText;
+            btnElement.disabled = false;
+        }
+    }
+</script>
+
+
+<script src="{{ url_for('static', filename='js/theme.js') }}"></script>
+</body>
+</html>
