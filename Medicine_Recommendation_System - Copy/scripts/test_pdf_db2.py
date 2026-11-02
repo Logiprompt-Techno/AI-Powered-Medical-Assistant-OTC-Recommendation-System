@@ -5,7 +5,7 @@ from pymongo import MongoClient
 from bson.objectid import ObjectId
 import utils.pdf_generator as pdf_gen
 
-MONGO_URI = "mongodb+srv://abhinavsaju1_db_user:abhinav12345@cluster0.4jzdhan.mongodb.net/?appName=Cluster0"
+MONGO_URI = "Mongo_URI"
 client = MongoClient(MONGO_URI)
 db = client.get_database("medicine_recommendation_db")
 
